@@ -1,0 +1,10 @@
+# Manual Test Plan & Execution Results
+
+| Test ID | Scenario | Steps to Reproduce | Expected Outcome | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TC-01** | Valid First-Time Purchase Claim | 1. Open `public/index.php`.<br>2. Enter seeded unclaimed code `BOX-A7K9-M2P4-X8Q3`, phone `9123456789`, name `Aarav Shah`.<br>3. Submit form. | Account created; `+150 pts` credited; code marked `claimed`; wallet auto-loads. | `+150 pts` credited and displayed in wallet immediately. | **PASS** |
+| **TC-02** | Duplicate / Code Reuse Prevention | 1. Attempt to claim `BOX-USED-9999-TEST` (or `BOX-A7K9-M2P4-X8Q3` again) using a different mobile number. | Claim rejected with fraud alert showing original redemption timestamp; attempt logged in `claim_attempts`. | Rejected with timestamp warning; logged in Admin Fraud Monitor. | **PASS** |
+| **TC-03** | Brute-Force Rate Limit Lockout | 1. Submit 5 invalid random codes consecutively from the same browser/IP. | On the 6th attempt, server returns HTTP `429` and blocks claims for 15 minutes. | HTTP `429` lockout message triggered on 6th attempt. | **PASS** |
+| **TC-04** | Recalled Batch Protection | 1. Attempt to claim `BOX-R1C9-L8B2-M4V7` belonging to `BATCH-2026-RECALL`. | Claim blocked with batch recall notice; zero points awarded. | Blocked with recall message; balance unchanged. | **PASS** |
+| **TC-05** | Reward Redemption & Insufficient Balance Check | 1. Try redeeming `350 pts` tool bag with `150 pts` balance.<br>2. Redeem `150 pts` warranty extension. | Step 1 rejected (`Insufficient points`). Step 2 deducts `150 pts`, decrements stock, and issues `VCH-XXXXXXXX`. | Insufficient balance blocked; valid redemption issued voucher code. | **PASS** |
+| **TC-06** | Admin Batch Generation & CSV Export | 1. Login to `admin/login.php`.<br>2. Generate batch of 10 codes.<br>3. Click `Export CSV`. | 10 unique `BOX-XXXX-XXXX-XXXX` codes created with HMAC signatures and downloaded as CSV. | CSV downloaded cleanly with claim URLs and signatures. | **PASS** |
